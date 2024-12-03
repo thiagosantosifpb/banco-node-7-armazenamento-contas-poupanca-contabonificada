@@ -1,29 +1,37 @@
 class Clientes {
     constructor() {
-        this.clientes = []; // Array para armazenar os clientes
+        // Tenta carregar os clientes do localStorage
+        this.clientes = this.carregar(); // Carregar clientes ao iniciar a classe
     }
-    // Método para inserir um cliente no array
     inserir(cliente) {
         this.clientes.push(cliente);
-        console.log('Cliente inserido:', cliente);
+        this.salvar(); // Salva os clientes no localStorage
     }
-    // Método para remover um cliente pelo CPF
     remover(cpf) {
         const index = this.clientes.findIndex(cliente => cliente.getCpf() === cpf);
         if (index !== -1) {
             this.clientes.splice(index, 1);
-            console.log(`Cliente com CPF ${cpf} removido com sucesso.`);
-            return true; // Cliente removido com sucesso
+            this.salvar(); // Salva os clientes no localStorage após a remoção
+            return true;
         }
-        console.log(`Cliente com CPF ${cpf} não encontrado.`);
-        return false; // Cliente não encontrado
+        return false;
     }
-    // Método para listar todos os clientes
     listar() {
         return this.clientes;
     }
-    // Método para pesquisar um cliente pelo CPF
     pesquisar(cpf) {
         return this.clientes.find(cliente => cliente.getCpf() === cpf);
+    }
+    salvar() {
+        // Converte os clientes para JSON e salva no localStorage
+        localStorage.setItem('clientes', JSON.stringify(this.clientes));
+    }
+    carregar() {
+        // Recupera os clientes do localStorage e converte para objetos Cliente
+        const clientesSalvos = localStorage.getItem('clientes');
+        if (clientesSalvos) {
+            return JSON.parse(clientesSalvos).map((clienteData) => new Cliente(clienteData.nome, clienteData.cpf, clienteData.conta));
+        }
+        return [];
     }
 }

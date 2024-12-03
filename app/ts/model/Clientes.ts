@@ -1,31 +1,45 @@
 class Clientes {
-    private clientes: Cliente[] = [];  // Array para armazenar os clientes
+    private clientes: Cliente[];
 
-    // Método para inserir um cliente no array
-    public inserir(cliente: Cliente): void {
-        this.clientes.push(cliente);
-        console.log('Cliente inserido:', cliente);
+    constructor() {
+        // Tenta carregar os clientes do localStorage
+        this.clientes = this.carregar(); // Carregar clientes ao iniciar a classe
     }
 
-    // Método para remover um cliente pelo CPF
-    public remover(cpf: string): boolean {
+    inserir(cliente: Cliente): void {
+        this.clientes.push(cliente);
+        this.salvar(); // Salva os clientes no localStorage
+    }
+
+    remover(cpf: string): boolean {
         const index = this.clientes.findIndex(cliente => cliente.getCpf() === cpf);
         if (index !== -1) {
             this.clientes.splice(index, 1);
-            console.log(`Cliente com CPF ${cpf} removido com sucesso.`);
-            return true;  // Cliente removido com sucesso
+            this.salvar(); // Salva os clientes no localStorage após a remoção
+            return true;
         }
-        console.log(`Cliente com CPF ${cpf} não encontrado.`);
-        return false;  // Cliente não encontrado
+        return false;
     }
 
-    // Método para listar todos os clientes
-    public listar(): Cliente[] {
+    listar(): Cliente[] {
         return this.clientes;
     }
 
-    // Método para pesquisar um cliente pelo CPF
-    public pesquisar(cpf: string): Cliente | undefined {
+    pesquisar(cpf: string): Cliente | undefined {
         return this.clientes.find(cliente => cliente.getCpf() === cpf);
+    }
+
+    private salvar(): void {
+        // Converte os clientes para JSON e salva no localStorage
+        localStorage.setItem('clientes', JSON.stringify(this.clientes));
+    }
+
+    private carregar(): Cliente[] {
+        // Recupera os clientes do localStorage e converte para objetos Cliente
+        const clientesSalvos = localStorage.getItem('clientes');
+        if (clientesSalvos) {
+            return JSON.parse(clientesSalvos).map((clienteData: any) => new Cliente(clienteData.nome, clienteData.cpf, clienteData.conta));
+        }
+        return [];
     }
 }
