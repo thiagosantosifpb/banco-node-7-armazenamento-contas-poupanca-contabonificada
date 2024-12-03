@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes</title>
+</head>
+
+<body>
+
+    <h1>Cadastro de Clientes</h1>
+
+    <!-- Formulário de Cadastro -->
+    <form id="clienteForm">
+        <label for="nome">Nome: </label>
+        <input type="text" id="nome" required>
+        <br>
+        <label for="cpf">CPF: </label>
+        <input type="text" id="cpf" required>
+        <br>
+        <label for="conta">Conta: </label>
+        <input type="text" id="conta" required>
+        <br>
+        <button type="submit">Adicionar Cliente</button>
+    </form>
+
+    <h2>Clientes Cadastrados</h2>
+    <!-- Lista de Clientes -->
+    <ul id="clientesList">
+        <!-- A lista de clientes será preenchida dinamicamente -->
+    </ul>
+
+    <script src="ClienteController.js"></script> <!-- Certifique-se de que esse arquivo está corretamente linkado -->
+    <script>
+        // Criar uma instância do ClienteController
+        const clienteController = new ClienteController();
+
+        // Função para exibir todos os clientes na tela
+        function listarClientes() {
+            const clientesList = document.getElementById("clientesList");
+            clientesList.innerHTML = ''; // Limpa a lista antes de reexibir
+            clienteController.listarClientes().forEach(cliente => {
+                const li = document.createElement("li");
+                li.textContent = `Nome: ${cliente.getNome()} | CPF: ${cliente.getCpf()} | Conta: ${cliente.getConta()}`;
+                // Adicionando um botão para remover o cliente
+                const btnRemover = document.createElement('button');
+                btnRemover.textContent = 'Remover';
+                btnRemover.addEventListener('click', () => {
+                    clienteController.removerCliente(cliente.getCpf());
+                    listarClientes(); // Recarregar a lista
+                });
+                li.appendChild(btnRemover);
+                clientesList.appendChild(li);
+            });
+        }
+
+        // Função para adicionar um novo cliente
+        document.getElementById("clienteForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nome").value;
+            const cpf = document.getElementById("cpf").value;
+            const conta = document.getElementById("conta").value;
+
+            // Usando o ClienteController para adicionar um novo cliente
+            clienteController.adicionarCliente(nome, cpf, conta);
+
+            // Limpar os campos do formulário
+            document.getElementById("nome").value = '';
+            document.getElementById("cpf").value = '';
+            document.getElementById("conta").value = '';
+
+            // Reexibir a lista de clientes
+            listarClientes();
+        });
+
+        // Exibir a lista inicial de clientes (caso haja algum no início)
+        listarClientes();
+    </script>
+
+</body>
+
+</html>
