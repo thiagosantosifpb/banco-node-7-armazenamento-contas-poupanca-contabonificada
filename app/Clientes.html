@@ -14,8 +14,8 @@
 
 <div id="mensagemView"></div>
 
+<!-- Formulário para Inserir Clientes -->
 <form class="form" id="formCliente">
-
     <div class="form-group">
         <label for="cliente">Cliente</label>
         <input type="text" id="cliente" class="form-control" required />
@@ -29,26 +29,92 @@
     <button class="btn btn-primary" type="submit">Inserir</button>
 </form>
 
-<br>
-<br>
+<br><br>
 
+<!-- Campo de Pesquisa -->
+<div class="form-group">
+    <label for="pesquisarCpf">Pesquisar por CPF</label>
+    <input type="text" id="pesquisarCpf" class="form-control" placeholder="Digite o CPF para pesquisa" />
+    <button class="btn btn-secondary" id="btnPesquisar">Pesquisar</button>
+</div>
+
+<br><br>
+
+<!-- Tabela de Clientes -->
 <table id="clientesTabela">
     <thead>
-    <tr>
-        <th>CLIENTE</th>
-        <th>CPF</th>
-    </tr>
+        <tr>
+            <th>CLIENTE</th>
+            <th>CPF</th>
+            <th>AÇÕES</th> <!-- Coluna para os botões de ação -->
+        </tr>
     </thead>
-
     <tbody>
+        <!-- Lista de clientes será inserida aqui -->
     </tbody>
-
-    <tfoot>
-    </tfoot>
 </table>
 
 <script>
-// Chamada para a função que irá manipular a inserção
+// Função para atualizar a tabela de clientes no HTML
+function atualizarTabela() {
+    const tabelaClientes = document.querySelector("#clientesTabela tbody");
+    tabelaClientes.innerHTML = ""; // Limpa a tabela antes de atualizar
+
+    // Recupera os clientes da lista
+    const clientes = clienteController.listarClientes();
+
+    // Itera sobre os clientes para exibir na tabela
+    clientes.forEach(cliente => {
+        const tr = document.createElement("tr");
+        
+        const tdNome = document.createElement("td");
+        tdNome.textContent = cliente.getNome();
+
+        const tdCpf = document.createElement("td");
+        tdCpf.textContent = cliente.getCpf();
+
+        const tdAcoes = document.createElement("td");
+        // Botão de Remover
+        const btnRemover = document.createElement("button");
+        btnRemover.textContent = "Remover";
+        btnRemover.classList.add("btn", "btn-danger");
+        btnRemover.onclick = () => removerCliente(cliente.getCpf()); // Função de remoção
+
+        tdAcoes.appendChild(btnRemover);
+
+        tr.appendChild(tdNome);
+        tr.appendChild(tdCpf);
+        tr.appendChild(tdAcoes);
+
+        tabelaClientes.appendChild(tr);
+    });
+}
+
+// Função para remover um cliente
+function removerCliente(cpf) {
+    const removido = clienteController.removerCliente(cpf);
+    if (removido) {
+        alert("Cliente removido com sucesso!");
+    } else {
+        alert("Cliente não encontrado.");
+    }
+    atualizarTabela(); // Atualiza a tabela após remoção
+}
+
+// Função de pesquisa
+document.getElementById('btnPesquisar').addEventListener('click', function() {
+    const cpfPesquisa = document.getElementById('pesquisarCpf').value;
+    if (cpfPesquisa) {
+        const cliente = clienteController.pesquisarCliente(cpfPesquisa);
+        if (cliente) {
+            alert(`Cliente encontrado: ${cliente.getNome()} - CPF: ${cliente.getCpf()}`);
+        } else {
+            alert("Cliente não encontrado.");
+        }
+    }
+});
+
+// Chamada para a função que irá manipular a inserção de clientes
 document.getElementById('formCliente').addEventListener('submit', function(event) {
     event.preventDefault(); // Previne o envio do formulário
 
@@ -61,6 +127,9 @@ document.getElementById('formCliente').addEventListener('submit', function(event
         atualizarTabela(); // Atualiza a tabela de clientes
     }
 });
+
+// Inicializa a tabela com os clientes existentes
+atualizarTabela();
 </script>
 
 </body>
